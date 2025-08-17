@@ -1,0 +1,93 @@
+﻿@model PostViewModel
+@{
+    ViewData["Title"] = "Create Post";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-lg border-0">
+                <div class=" d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Create Post</h4>
+                    <a asp-action="Index" class="btn btn-primary rounded-pill btn p-2">Back to List</a>
+                </div>
+                <hr/>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" asp-controller="Post" enctype="multipart/form-data">
+
+                        <!-- Validation Card -->
+                        <div id="errorCard" class="alert alert-warning d-none">
+                            <h6 class="alert-heading">Please fix the following:</h6>
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="post.Title" class="form-label">Title</label>
+                            <input asp-for="post.Title" class="form-control bg-secondary text-black"  />
+                            <span asp-validation-for="post.Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="post.CategoryId" class="form-label">Category</label>
+                            <select asp-for="post.CategoryId" asp-items="Model.categories" class="form-select bg-secondary text-black">
+                                <option value="">Select Category</option>
+                            </select>
+                            <span asp-validation-for="post.CategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="post.Author" class="form-label">Author</label>
+                            <input asp-for="post.Author" class="form-control bg-secondary text-black" />
+                            <span asp-validation-for="post.Author" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="post.Content" class="form-label">Content</label>
+                            <textarea asp-for="post.Content" class="form-control bg-secondary text-black" rows="5"></textarea>
+                            <span asp-validation-for="post.Content" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="publishImage" class="form-label">Image</label>
+                            <input asp-for="publishImage" type="file" class="form-control bg-secondary text-black" />
+                        </div>
+
+                        <div class="text-center mx-2">
+                            <button type="submit" class="btn btn-primary px-4 rounded-pill">Create</button>
+                            <a asp-action="Index" class="btn btn-primary rounded-pill btn px-y">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.tiny.cloud/1/pzm5ju5i2dg7i74kpc0wq0gnlnwpxsm0mxjs8gftsj0m7gto/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const errorCard = document.getElementById("errorCard");
+
+            const observer = new MutationObserver(() => {
+                if (errorCard.querySelector("ul") && errorCard.querySelector("ul").children.length > 0) {
+                    errorCard.classList.remove("d-none");
+
+                    setTimeout(() => {
+                        errorCard.classList.add("d-none");
+                    }, 4000);
+                }
+            });
+
+            observer.observe(errorCard, { childList: true, subtree: true });
+        });
+        // Text editor
+
+         tinymce.init({
+          selector: 'textarea'
+        });
+    </script>
+   
+}
