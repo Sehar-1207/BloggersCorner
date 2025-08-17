@@ -1,1 +1,23 @@
-﻿
+﻿@model Post
+@{
+    ViewBag.Title = Model.Title;
+}
+<div class="container">
+    <div class="text-end">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-2">Edit Post</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger rounded-pill mx-2 px-2">Delete Post</a>
+    </div>
+    <hr/>
+    <div>
+        <h1>@Model.Title</h1>
+        <p><span class="badge bg-info"> By : </span> @Model.Author
+            | <span class="badge bg-info"> Published Atn: </span> @Model.PublishedAt.ToString("MMM dd,yyyy")</p>
+        <p><span class="badge bg-success text-light"> Category : </span> <i class="bi bi-hash"></i> @Model.Category.Name
+            | <span class="badge bg-success text-light"> Likes : </span> <i class="bi bi-suit-heart"></i> @Model.Likes.Count  </p>
+
+        <div>
+            <img src="@Model.Imagepath" alt="@Model.Title" class="object-fit-cover"/>
+        </div>
+    </div>
+
+</div>

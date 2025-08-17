@@ -33,8 +33,8 @@
                             @(contents.Length > 100 ? contents.Substring(0,100) + "..." : contents))
                         </p>
 
-                        <span class="badge bg-success">@posts.Category?.Name</span>
-                        <span class="badge bg-info">@posts.Likes</span>
+                        <div class="badge bg-success"><i class="bi bi-hash"></i> @posts.Category?.Name</div>
+                        <div class="badge bg-info"><i class="bi bi-suit-heart"></i> @posts.Likes?.Count</div>
                     </div>
 
                     <div class="card-footer d-flex justify-content-between align-items-center">
