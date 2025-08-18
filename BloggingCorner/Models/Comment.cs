@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BloggingCorner.Models
@@ -16,6 +17,7 @@ namespace BloggingCorner.Models
         public DateTime CommentAt { get; set; } = DateTime.UtcNow;
         [ForeignKey("Post")]
         public int PostId { get; set; }
+        [ValidateNever]
         public Post Post { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BloggingCorner.Data;
+using BloggingCorner.Models;
 using BloggingCorner.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -127,6 +128,23 @@ namespace BloggingCorner.Controllers
             }
 
             return View(post);
+        }
+
+        [HttpPost]
+        public IActionResult AddComment(Comment comment)
+        {
+            if (ModelState.IsValid)
+            {
+                comment.CommentAt = DateTime.UtcNow;
+                _db.Comments.Add(comment);
+                _db.SaveChanges();
+
+                // Redirect back to the post details page
+                return RedirectToAction("Details", "Post", new { id = comment.PostId });
+            }
+
+            // Show same page with errors
+            return RedirectToAction("Details", "Post", new { id = comment.PostId });
         }
 
     }

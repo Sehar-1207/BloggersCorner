@@ -2,22 +2,116 @@
 @{
     ViewBag.Title = Model.Title;
 }
-<div class="container">
+<div class="container mb-5">
     <div class="text-end">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-2">Edit Post</a>
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger rounded-pill mx-2 px-2">Delete Post</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-2">Edit Post</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger rounded-pill mx-2 px-2">Delete Post</a>
     </div>
-    <hr/>
-    <div>
-        <h1>@Model.Title</h1>
-        <p><span class="badge bg-info"> By : </span> @Model.Author
-            | <span class="badge bg-info"> Published Atn: </span> @Model.PublishedAt.ToString("MMM dd,yyyy")</p>
-        <p><span class="badge bg-success text-light"> Category : </span> <i class="bi bi-hash"></i> @Model.Category.Name
-            | <span class="badge bg-success text-light"> Likes : </span> <i class="bi bi-suit-heart"></i> @Model.Likes.Count  </p>
 
-        <div>
-            <img src="@Model.Imagepath" alt="@Model.Title" class="object-fit-cover"/>
+    <hr />
+
+    <h1>@Model.Title</h1>
+    <p>
+        <span class="badge bg-info">By :</span> @Model.Author |
+        <span class="badge bg-info">Published At:</span> @Model.PublishedAt.ToString("MMM dd, yyyy")
+    </p>
+    <p>
+        <span class="badge bg-success text-light">Category :</span> @Model.Category?.Name |
+        <span class="badge bg-success text-light">Likes :</span> @Model.Likes?.Count
+    </p>
+
+    <img src="~/@Model.Imagepath" asp-append-version="true" alt="@Model.Title"
+         style="height:400px; width:90%; margin-bottom:5px; object-fit:cover;" />
+
+    <hr />
+
+    <div>@Html.Raw(Model.Content)</div>
+
+    <hr />
+
+    <div id="commentdata">
+        @if (Model.Comments != null && Model.Comments.Any())
+        {
+            foreach (var comment in Model.Comments)
+            {
+                <div class="card mb-3 shadow-lg">
+                    <h5 class="card-header">@comment.username</h5>
+                    <div class="card-body">
+                        <p class="text-muted">Posted on @comment.CommentAt.ToString("MMM dd, yyyy")</p>
+                        <p class="card-text">@comment.Commentcontent</p>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted m-2">Be the first person to write a comment!</p>
+        }
+    </div>
+
+    <h3>Add Comment</h3>
+    <form id="commentPost" method="post">
+        <div class="form-group mb-2">
+            <label for="username">Name</label>
+            <input id="username" name="username" required class="form-control" />
         </div>
-    </div>
-
+        <div class="form-group mb-2">
+            <label for="commentContent">Comment Content</label>
+            <textarea id="commentContent" name="Commentcontent" required class="form-control" rows="3"></textarea>
+        </div>
+        <button class="btn btn-primary btn-sm mt-2 p-2 rounded" type="submit">Post Comment</button>
+    </form>
 </div>
+
+@section script {
+    <script>
+        $(document).ready(function () {
+            $("#commentPost").submit(function (event) {
+                event.preventDefault();
+
+                var name = $("#username").val();
+                var content = $("#commentContent").val();
+                var postId = @Model.Id;
+
+                if (name && content) {
+                    $.ajax({
+                        url: '@Url.Action("AddComment", "Post")',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            PostId: postId,
+                            username: name,
+                            Commentcontent: content
+                        }),
+                        success: function (response) {
+                            if (response.success === false) {
+                                alert("Failed to add comment: " + (response.errors ? response.errors.join(", ") : response.message));
+                                return;
+                            }
+                            $('#commentdata')[0].reset
+                            $("#commentdata").append(`
+                              <div class="card mb-3 shadow-lg">
+                                  <h5 class="card-header">${response.username}</h5>
+                                     <div class="card-body">
+                                        <p class="text-muted">Posted on ${response.commentAt}</p>
+                                        <p class="card-text">${response.commentcontent}</p>
+                                       </div>
+                                 </div>
+                             `);
+
+                            $("#username").val("");
+                            $("#commentContent").val("");
+                        },
+
+                        error: function (xhr, status, error) {
+                            console.error("Error adding comment:", error);
+                        
+                        }
+                    });
+                } else {
+                    alert("Please fill in both fields.");
+                }
+            });
+        });
+    </script>
+}
