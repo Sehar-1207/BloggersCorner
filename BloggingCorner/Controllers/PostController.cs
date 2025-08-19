@@ -113,7 +113,7 @@ namespace BloggingCorner.Controllers
 
         public async Task<ActionResult> Details(int id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -130,22 +130,116 @@ namespace BloggingCorner.Controllers
             return View(post);
         }
 
-        [HttpPost]
-        public IActionResult AddComment(Comment comment)
+        public JsonResult AddComment([FromBody] Comment comment)
         {
+
             if (ModelState.IsValid)
             {
                 comment.CommentAt = DateTime.UtcNow;
                 _db.Comments.Add(comment);
                 _db.SaveChanges();
 
-                // Redirect back to the post details page
-                return RedirectToAction("Details", "Post", new { id = comment.PostId });
+                return Json(new
+                {
+                    username = comment.username,
+                    commentAt = comment.CommentAt.ToString("MMM dd, yyyy"),
+                    commentContent = comment.Commentcontent
+                });
             }
 
-            // Show same page with errors
-            return RedirectToAction("Details", "Post", new { id = comment.PostId });
+            // Return validation errors for debugging
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            return Json(new { success = false, message = "Failed to add comment.", errors });
         }
 
+        public async Task<IActionResult> LikePost(int postId)
+        {
+            var post = await _db.Posts.FindAsync(postId);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            var like = new Like
+            {
+                PostId = postId,
+                LikedAt = DateTime.UtcNow
+            };
+            _db.Likes.Add(like);
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Details", new { id = postId });
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var post = await _db.Posts.FirstOrDefaultAsync(p=>p.Id == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            EditPostViewModel edit = new EditPostViewModel
+            {
+                post = post,
+                categories = _db.Categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList()
+            };
+            return View(edit);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditPostViewModel editPostViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                editPostViewModel.categories = _db.Categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList();
+                return View(editPostViewModel);
+            }
+
+            var postfromDb = await _db.Posts.FirstOrDefaultAsync(p => p.Id == editPostViewModel.post.Id);
+            if (postfromDb == null) {
+                return NotFound();
+            }
+
+            if (editPostViewModel.publishImage != null)
+            {
+                var imageExtensionpath = Path.GetExtension(editPostViewModel.publishImage.FileName).ToLower();
+                bool isallowed = allowedExtension.Contains(imageExtensionpath);
+                if (!isallowed)
+                {
+                    ModelState.AddModelError("publishImage", "Please upload a valid image file (jpg, jpeg, png, gif).");
+                    editPostViewModel.categories = _db.Categories.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    }).ToList();
+                    return View(editPostViewModel);
+                }
+                var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath,"Images", postfromDb.Imagepath);
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+                editPostViewModel.post.Imagepath = await UploadFilet(editPostViewModel.publishImage);
+            }
+            else
+            {
+                 editPostViewModel.post.Imagepath = postfromDb.Imagepath; // Keep the old image path if no new image is uploaded
+            }
+            _db.Posts.Update(editPostViewModel.post);
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
     }
 }

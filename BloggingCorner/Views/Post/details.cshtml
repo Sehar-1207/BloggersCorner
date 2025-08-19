@@ -4,8 +4,8 @@
 }
 <div class="container mb-5">
     <div class="text-end">
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning rounded-pill px-2">Edit Post</a>
-        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger rounded-pill mx-2 px-2">Delete Post</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" asp-controller="Post" class="btn btn-warning rounded-pill px-2">Edit Post</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" asp-controller="post" class="btn btn-danger rounded-pill mx-2 px-2">Delete Post</a>
     </div>
 
     <hr />
@@ -88,7 +88,6 @@
                                 alert("Failed to add comment: " + (response.errors ? response.errors.join(", ") : response.message));
                                 return;
                             }
-                            $('#commentdata')[0].reset
                             $("#commentdata").append(`
                               <div class="card mb-3 shadow-lg">
                                   <h5 class="card-header">${response.username}</h5>
@@ -101,6 +100,9 @@
 
                             $("#username").val("");
                             $("#commentContent").val("");
+
+                             ✅ reset form correctly
+                            $("#commentPost")[0].reset();
                         },
 
                         error: function (xhr, status, error) {
