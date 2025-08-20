@@ -8,6 +8,8 @@ namespace BloggingCorner.Models.ViewModels
         public Post post { get; set; }
         [ValidateNever]
         public IEnumerable<SelectListItem> categories { get; set; }
+
+        [ValidateNever]
         public IFormFile publishImage { get; set; }
     }
 }

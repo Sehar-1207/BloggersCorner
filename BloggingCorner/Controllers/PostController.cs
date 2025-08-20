@@ -72,6 +72,7 @@ namespace BloggingCorner.Controllers
             }).ToList();
             return View(postmodel);
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(PostViewModel postmodel)
         {
@@ -113,7 +114,7 @@ namespace BloggingCorner.Controllers
 
         public async Task<ActionResult> Details(int id)
         {
-            if (id == null)
+            if (id <= 0)
             {
                 return NotFound();
             }
@@ -128,46 +129,6 @@ namespace BloggingCorner.Controllers
             }
 
             return View(post);
-        }
-
-        public JsonResult AddComment([FromBody] Comment comment)
-        {
-
-            if (ModelState.IsValid)
-            {
-                comment.CommentAt = DateTime.UtcNow;
-                _db.Comments.Add(comment);
-                _db.SaveChanges();
-
-                return Json(new
-                {
-                    username = comment.username,
-                    commentAt = comment.CommentAt.ToString("MMM dd, yyyy"),
-                    commentContent = comment.Commentcontent
-                });
-            }
-
-            // Return validation errors for debugging
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-            return Json(new { success = false, message = "Failed to add comment.", errors });
-        }
-
-        public async Task<IActionResult> LikePost(int postId)
-        {
-            var post = await _db.Posts.FindAsync(postId);
-            if (post == null)
-            {
-                return NotFound();
-            }
-            var like = new Like
-            {
-                PostId = postId,
-                LikedAt = DateTime.UtcNow
-            };
-            _db.Likes.Add(like);
-            await _db.SaveChangesAsync();
-            return RedirectToAction("Details", new { id = postId });
-
         }
 
         [HttpGet]
@@ -207,7 +168,7 @@ namespace BloggingCorner.Controllers
                 return View(editPostViewModel);
             }
 
-            var postfromDb = await _db.Posts.FirstOrDefaultAsync(p => p.Id == editPostViewModel.post.Id);
+            var postfromDb = await _db.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == editPostViewModel.post.Id);
             if (postfromDb == null) {
                 return NotFound();
             }
@@ -241,5 +202,68 @@ namespace BloggingCorner.Controllers
             await _db.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            return View(post);
+        }
+
+        [HttpPost]
+        [ActionName("Delete")]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            if (!string.IsNullOrEmpty(post.Imagepath))
+            {
+                var imagePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", post.Imagepath);
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            _db.Posts.Remove(post);
+            await _db.SaveChangesAsync();
+            return RedirectToAction("Index");
+        }
+
+        public JsonResult AddComment([FromBody] Comment comment)
+        {
+
+            if (ModelState.IsValid)
+            {
+                comment.CommentAt = DateTime.UtcNow;
+                _db.Comments.Add(comment);
+                _db.SaveChanges();
+
+                return Json(new
+                {
+                    username = comment.username,
+                    commentAt = comment.CommentAt.ToString("MMM dd, yyyy"),
+                    commentContent = comment.Commentcontent
+                });
+            }
+
+            // Return validation errors for debugging
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            return Json(new { success = false, message = "Failed to add comment.", errors });
+        }
+
+
     }
 }

@@ -1,44 +1,76 @@
 ﻿@using BloggingCorner.Helper
 @model IEnumerable<Post>
+
 @{
     ViewData["Title"] = "Posts";
 }
+
 <div class="container my-5">
     <div class="container text-center">
         @if (ViewBag.Categories != null)
         {
             @foreach (var category in ViewBag.Categories)
             {
-                <a asp-action="Index" asp-route-categoryid="@category.Id" asp-controller="Post"
-                   class="badges ms-2 p-2 bg-danger text-light text-decoration-none">@category.Name</a>
+                <a asp-action="Index"
+                   asp-route-categoryid="@category.Id"
+                   asp-controller="Post"
+                   class="badges ms-2 p-2 bg-danger text-light text-decoration-none">
+                    @category.Name
+                </a>
             }
         }
     </div>
-    <div class="text-end">
-        <a asp-action="Create" asp-controller="Post" class="btn btn-primary rounded-pill btn p-2">Create</a>
+
+    <div class="text-end my-3">
+        <a asp-action="Create"
+           asp-controller="Post"
+           class="btn btn-primary rounded-pill p-2">
+            Create
+        </a>
     </div>
+
     <div class="row g-4 mt-2">
         @foreach (var posts in Model)
         {
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-lg rounded-1">
-                    <img src="@posts.Imagepath" alt="@posts.Title" class="card-img-top" style="height:300px; object-fit:cover;" />
+                    <img src="@posts.Imagepath"
+                         alt="@posts.Title"
+                         class="card-img-top"
+                         style="height:300px; object-fit:cover;" />
+
                     <div class="card-body">
                         <h5 class="card-title">@posts.Title</h5>
-                        <p class="text-muted mb-2">Published on @posts.PublishedAt.ToString("MMM dd, yyyy") </p>
-                        @{
-                            var contents = RemoveHtmlHelper.RemoveHelperTag(posts.Content);
-                        }
-                        <p class=" card-text">
-                            @(contents.Length > 100 ? contents.Substring(0,100) + "..." : contents))
+                        <p class="text-muted mb-2">
+                            Published on @posts.PublishedAt.ToString("MMM dd, yyyy")
                         </p>
 
-                        <div class="badge bg-success"><i class="bi bi-hash"></i> @posts.Category?.Name</div>
-                        <div class="badge bg-info"><i class="bi bi-suit-heart"></i> @posts.Likes?.Count</div>
+                        @* ✅ Use the improved helper *@
+                        @{
+                            var contents = string.IsNullOrWhiteSpace(posts.Content)
+                            ? "No content available"
+                            : RemoveHtmlHelper.RemoveHelperTag(posts.Content);
+                        }
+
+                        <p class="card-text">
+                            @(contents.Length > 100 ? contents.Substring(0, 100) + "..." : contents)
+                        </p>
+
+                        <div class="badge bg-success">
+                            <i class="bi bi-hash"></i> @posts.Category?.Name
+                        </div>
+                        <div class="badge bg-info">
+                            <i class="bi bi-suit-heart"></i> @posts.Likes?.Count
+                        </div>
                     </div>
 
                     <div class="card-footer d-flex justify-content-between align-items-center">
-                        <a class="btn btn-primary btn-small" asp-action="Details" asp-controller="Post" asp-route-id="@posts.Id">Read More</a>
+                        <a class="btn btn-primary btn-sm"
+                           asp-action="Details"
+                           asp-controller="Post"
+                           asp-route-id="@posts.Id">
+                            Read More
+                        </a>
                         <div class="text-end">
                             <span class="text-muted">@posts.Author</span>
                         </div>
@@ -47,5 +79,4 @@
             </div>
         }
     </div>
-
 </div>

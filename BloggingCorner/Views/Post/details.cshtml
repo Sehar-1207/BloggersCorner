@@ -5,7 +5,7 @@
 <div class="container mb-5">
     <div class="text-end">
         <a asp-action="Edit" asp-route-id="@Model.Id" asp-controller="Post" class="btn btn-warning rounded-pill px-2">Edit Post</a>
-        <a asp-action="Delete" asp-route-id="@Model.Id" asp-controller="post" class="btn btn-danger rounded-pill mx-2 px-2">Delete Post</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" asp-controller="Post" class="btn btn-danger rounded-pill mx-2 px-2">Delete Post</a>
     </div>
 
     <hr />
@@ -21,7 +21,7 @@
     </p>
 
     <img src="~/@Model.Imagepath" asp-append-version="true" alt="@Model.Title"
-         style="height:400px; width:90%; margin-bottom:5px; object-fit:cover;" />
+         style="height:450px; width:100%; margin-bottom:5px; object-fit:cover;" />
 
     <hr />
 
@@ -53,7 +53,7 @@
     <form id="commentPost" method="post">
         <div class="form-group mb-2">
             <label for="username">Name</label>
-            <input id="username" name="username" required class="form-control" />
+            <input id="username" name="Username" required class="form-control" />
         </div>
         <div class="form-group mb-2">
             <label for="commentContent">Comment Content</label>
@@ -63,7 +63,7 @@
     </form>
 </div>
 
-@section script {
+@section Scripts {
     <script>
         $(document).ready(function () {
             $("#commentPost").submit(function (event) {
@@ -80,7 +80,7 @@
                         contentType: 'application/json',
                         data: JSON.stringify({
                             PostId: postId,
-                            username: name,
+                            Username: name,
                             Commentcontent: content
                         }),
                         success: function (response) {
@@ -88,26 +88,22 @@
                                 alert("Failed to add comment: " + (response.errors ? response.errors.join(", ") : response.message));
                                 return;
                             }
+
                             $("#commentdata").append(`
                               <div class="card mb-3 shadow-lg">
                                   <h5 class="card-header">${response.username}</h5>
-                                     <div class="card-body">
-                                        <p class="text-muted">Posted on ${response.commentAt}</p>
-                                        <p class="card-text">${response.commentcontent}</p>
-                                       </div>
-                                 </div>
-                             `);
+                                  <div class="card-body">
+                                      <p class="text-muted">Posted on ${response.commentAt}</p>
+                                      <p class="card-text">${response.commentcontent}</p>
+                                  </div>
+                              </div>
+                            `);
 
-                            $("#username").val("");
-                            $("#commentContent").val("");
-
-                             ✅ reset form correctly
+                            // Reset form
                             $("#commentPost")[0].reset();
                         },
-
                         error: function (xhr, status, error) {
                             console.error("Error adding comment:", error);
-                        
                         }
                     });
                 } else {
