@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace BloggingCorner.Models
 {
@@ -9,6 +10,7 @@ namespace BloggingCorner.Models
         [Required]
         public string Name { get; set; }
         public string? Description { get; set; }
+        [ValidateNever]
         public ICollection<Post> posts { get; set; }
     }
 }

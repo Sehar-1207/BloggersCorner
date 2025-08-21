@@ -1,0 +1,31 @@
+﻿@model BloggingCorner.Models.Category
+
+<div class="justify-content-center card-header align-items-center col-6">
+    <div class="card shadow p-4" >
+        <h3 class="text-center mb-3">Create Category</h3>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm justify-content-center align-content-center">Create Category</button>
+            <a asp-action="Index" class="btn btn-secondary"> Cancel </a>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

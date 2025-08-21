@@ -1,0 +1,16 @@
+﻿@model LoginDto
+
+<div class="form-container sign-in-container">
+    <form asp-controller="Auth" asp-action="Login" method="post" class="auth-form">
+        <h1>Sign in</h1>
+
+        <input asp-for="Email" placeholder="Email" type="email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+
+        <input asp-for="Password" placeholder="Password" type="password"/>
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+        <a href="#">Forgot Your Password?</a>
+        <button type="submit" class="auth-button">Sign In</button>
+    </form>
+</div>

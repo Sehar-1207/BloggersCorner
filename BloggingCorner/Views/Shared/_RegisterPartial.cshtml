@@ -1,0 +1,28 @@
+﻿@model RegisterDto
+
+<div class="form-container sign-up-container">
+    <form asp-controller="Auth" asp-action="Register" method="post" class="auth-form">
+        <h1>Create Account</h1>
+
+        <input asp-for="UserName" placeholder="Username" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+
+        <input asp-for="FullName" placeholder="Full Name" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+
+        <input asp-for="Email" placeholder="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+
+        <input asp-for="Password" placeholder="Password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+        <input asp-for="ConfirmPassword" placeholder="Confirm Password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+        <input asp-for="AdminCode" placeholder="Admin Code (Optional)" type="password" />
+        <span asp-validation-for="AdminCode" class="text-danger"></span>
+
+
+        <button type="submit" class="auth-button">Sign Up</button>
+    </form>
+</div>

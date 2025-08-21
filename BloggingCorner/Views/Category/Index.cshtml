@@ -1,0 +1,33 @@
+﻿@model IEnumerable<BloggingCorner.Models.Category>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
+    <div class="card shadow p-4" style="width:600px;">
+        <h3 class="text-center mb-3">All Categories</h3>
+
+        <table class="table table-bordered text-center">
+            <thead class="table-warning">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Total Posts</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var category in Model)
+                {
+                    <tr>
+                        <td>@category.Id</td>
+                        <td>@category.Name</td>
+                        <td>@category.Description</td>
+                        <td>@(category.posts?.Count() ?? 0)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="text-center mt-3">
+            <a asp-action="Create" class="btn btn-primary">+ Add Category</a>
+        </div>
+    </div>
+</div>
