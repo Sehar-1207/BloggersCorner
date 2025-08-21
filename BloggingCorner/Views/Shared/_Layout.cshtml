@@ -48,17 +48,6 @@
                         {
                             // Fetch the current user synchronously for layout
                             var currentUser = UserManager.GetUserAsync(User).Result;
-                            @* <li class="nav-item">
-                                <div class="navbar-text text-white d-inline mt-2">
-                                    Hello, @(currentUser?.FullName ?? currentUser?.UserName)!
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link text-light">Logout</button>
-                                </form>
-                            </li>
-                         *@
                             <li class="nav-item d-flex align-items-center gap-2">
                                 <div class="navbar-text text-white px-3 py-2 rounded-pill text-center">
                                     Hello, @(currentUser?.FullName ?? currentUser?.UserName)!
@@ -92,9 +81,9 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted text-center py-1" style="font-size:0.8rem;">
+    @* <footer class="border-top footer text-muted text-center" style="font-size:0.8rem; margin-top:9px;">
         &copy; 2025 - BloggingCorner - By Sehar Ajmal
-    </footer>
+    </footer> *@
 
 
     <!-- JS -->

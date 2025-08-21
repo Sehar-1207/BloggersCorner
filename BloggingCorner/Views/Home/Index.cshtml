@@ -1,1 +1,83 @@
-﻿
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        /* Gradient background */
+        background: linear-gradient(to right, #FFD6E7, #D6E5FF, #D6FFFC);
+    }
+    /* Background container */
+    .slideshow-container {
+        position: relative;
+        width: 100%;
+        height: 85vh;
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+    /* Background images */
+    .slideshow-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.8; /* Slightly transparent */
+        filter: brightness(0.5); /* Darken the images to 50% brightness */
+        transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
+    }
+
+
+    /* Welcome text with gradient */
+    .welcome-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3em;
+        font-weight: bold;
+        text-align: center;
+        z-index: 2;
+        font-family: Arial, sans-serif;
+        /* Gradient text */
+        background: linear-gradient(75deg, #FF6B6B, #FFB347, #FF77FF, #77FFFF);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        /* Optional: subtle shadow for visibility */
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.35);
+    }
+</style>
+
+<div class="slideshow-container">
+    <div class="welcome-text">Welcome to Blogging Corner</div>
+
+    <img src="~/home/h3.jpg" class="slideshow-image" />
+    <img src="~/home/h6.jpg" class="slideshow-image" />
+    <img src="~/home/h1.jpg" class="slideshow-image" />
+    <img src="~/home/h7.jpg" class="slideshow-image" />
+    <img src="~/home/h2.jpg" class="slideshow-image" />
+    <img src="~/home/h8.jpg" class="slideshow-image" />
+    <img src="~/home/h4.jpg" class="slideshow-image" />
+    <img src="~/home/h9.jpg" class="slideshow-image" />
+    <img src="~/home/h5.jpg" class="slideshow-image" />
+</div>
+
+<script>
+    const images = document.querySelectorAll('.slideshow-image');
+    let current = 0;
+
+    function showNextImage() {
+        images.forEach((img, index) => {
+            img.style.opacity = index === current ? '0.8' : '0';
+        });
+
+        current = (current + 1) % images.length;
+    }
+
+    showNextImage();
+    setInterval(showNextImage, 3000);
+</script>

@@ -21,14 +21,14 @@
             }
         }
     </div>
-
+    <hr/>
     <!-- Create Post Button (Admins only) -->
     @if (User.IsInRole("Admin"))
     {
         <div class="text-end my-3">
             <a asp-action="Create"
                asp-controller="Post"
-               class="btn btn-primary rounded-pill px-4 py-2">
+               class="btn btn-primary rounded-pill px-3 py-2">
                 Create Post
             </a>
         </div>
