@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BloggingCorner.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250821120618_BlogDbAdded")]
-    partial class BlogDbAdded
+    [Migration("20250821150646_dbaddingBlog")]
+    partial class dbaddingBlog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

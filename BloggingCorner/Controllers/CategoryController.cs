@@ -1,10 +1,12 @@
 ﻿using BloggingCorner.Data;
 using BloggingCorner.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BloggingCorner.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -15,6 +17,7 @@ namespace BloggingCorner.Controllers
         }
 
         // GET: /Category
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var categories = await _context.Categories
@@ -26,6 +29,7 @@ namespace BloggingCorner.Controllers
 
         // GET: /Category/Create
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();

@@ -7,7 +7,7 @@
 <div class="container my-5">
 
     <!-- Categories -->
-    <div class="container text-center mb-3">
+    <div class="mb-3">
         @if (ViewBag.Categories != null)
         {
             @foreach (var category in ViewBag.Categories)
@@ -15,13 +15,14 @@
                 <a asp-action="Index"
                    asp-route-categoryid="@category.Id"
                    asp-controller="Post"
-                   class="badge rounded-pill ms-1 p-2 bg-danger text-light text-decoration-none">
+                   class="badge rounded-pill my-2 p-2 bg-danger text-light text-decoration-none">
                     @category.Name
                 </a>
             }
         }
     </div>
-    <hr/>
+    <hr />
+
     <!-- Create Post Button (Admins only) -->
     @if (User.IsInRole("Admin"))
     {
@@ -66,7 +67,7 @@
                         </div>
 
                         <!-- Like Button -->
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center mb-2">
                             <button class="btn btn-outline-danger btn-sm rounded-pill like-btn px-3"
                                     data-post-id="@post.Id"
                                     data-liked="@isLiked">
@@ -74,16 +75,17 @@
                                 <span class="ms-1 like-count">@post.Likes?.Count</span>
                             </button>
                         </div>
+
                     </div>
 
                     <!-- Footer -->
                     <div class="card-footer d-flex justify-content-between align-items-center rounded-bottom-4">
-                        <a class="btn btn-primary btn-sm rounded-pill px-3"
-                           asp-action="Details"
-                           asp-controller="Post"
-                           asp-route-id="@post.Id">
+                        <!-- Read More Button -->
+                        <button class="btn btn-primary btn-sm rounded-pill px-3 read-more-btn"
+                                data-post-id="@post.Id"
+                                data-details-url="@Url.Action("Details", "Post", new { id = post.Id })">
                             Read More
-                        </a>
+                        </button>
                         <div class="text-end">
                             <span class="text-muted">@post.Author</span>
                         </div>
@@ -103,7 +105,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>You need to login to like posts.</p>
+                <p>You need to login to view post details or like posts.</p>
                 <a asp-action="Index" asp-controller="Auth" asp-route-panel="login" class="btn btn-primary rounded-pill px-4">Login</a>
             </div>
         </div>
@@ -114,16 +116,16 @@
     <script>
         $(function () {
 
+            var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase() === 'true';
+
+            // Like button click
             $('.container').on("click", ".like-btn", function (e) {
                 e.preventDefault();
-
                 var btn = $(this);
                 var postId = btn.data("post-id");
                 var icon = btn.find("i");
                 var countSpan = btn.find(".like-count");
 
-                // If user is not logged in, show login modal and fetch latest count
-                var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase() === 'true';
                 if (!isLoggedIn) {
                     $('#loginModal').modal('show');
                     $.get('/Post/GetLikeCount', { postId: postId }, function(res) {
@@ -158,6 +160,18 @@
                         btn.prop("disabled", false);
                     }
                 });
+            });
+
+            // Read More button click
+            $('.container').on("click", ".read-more-btn", function(e){
+                e.preventDefault();
+                if(!isLoggedIn){
+                    $('#loginModal').modal('show');
+                    return;
+                }
+
+                var url = $(this).data("details-url");
+                window.location.href = url;
             });
 
         });

@@ -51,6 +51,7 @@ namespace BloggingCorner.Controllers
             }
             return "images/" + filepath;
         }
+
         public async Task<IActionResult> Index(int? categoryid)
         {
             var query = _db.Posts
@@ -79,7 +80,6 @@ namespace BloggingCorner.Controllers
             return View(posts);
         }
 
-
         [HttpGet]
         public IActionResult Create()
         {
@@ -93,6 +93,7 @@ namespace BloggingCorner.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(PostViewModel postmodel)
         {
             if (!ModelState.IsValid)
@@ -131,6 +132,7 @@ namespace BloggingCorner.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "User , Admin")]
         public async Task<ActionResult> Details(int id)
         {
             if (id <= 0)
@@ -175,6 +177,7 @@ namespace BloggingCorner.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(EditPostViewModel editPostViewModel)
         {
             if (!ModelState.IsValid)
@@ -223,6 +226,7 @@ namespace BloggingCorner.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Delete(int id)
         {
             if (id == null)
@@ -238,6 +242,7 @@ namespace BloggingCorner.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ActionName("Delete")]
         public async Task<IActionResult> DeletePost(int id)
         {
@@ -260,6 +265,8 @@ namespace BloggingCorner.Controllers
             await _db.SaveChangesAsync();
             return RedirectToAction("Index");
         }
+
+        [Authorize(Roles = "User , Admin")]
 
         public JsonResult AddComment([FromBody] Comment comment)
         {
@@ -299,7 +306,7 @@ namespace BloggingCorner.Controllers
             });
         }
 
-        // Only logged-in Users can like/unlike
+        
         [HttpPost]
         [Authorize(Roles = "User , Admin")]
         public async Task<IActionResult> ToggleLike(int postId)

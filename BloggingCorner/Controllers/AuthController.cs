@@ -83,7 +83,7 @@ namespace BloggingCorner.Controllers
 
             // Sign in
             await _signInManager.SignInAsync(user, isPersistent: false);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Post");
         }
 
 
@@ -104,7 +104,7 @@ namespace BloggingCorner.Controllers
                     user, model.Password, model.RememberMe, lockoutOnFailure: false);
 
                 if (result.Succeeded)
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Post");
             }
 
             ModelState.AddModelError("", "Invalid login attempt.");
