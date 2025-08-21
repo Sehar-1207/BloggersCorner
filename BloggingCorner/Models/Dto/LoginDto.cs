@@ -10,5 +10,7 @@ namespace BloggingCorner.Models.Dto
         [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; }
 
+        public bool RememberMe { get; set; } // Default to false
+
     }
 }

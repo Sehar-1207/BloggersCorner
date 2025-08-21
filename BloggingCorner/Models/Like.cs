@@ -15,5 +15,9 @@ namespace BloggingCorner.Models
         [ForeignKey("Post")]
         public int PostId { get; set; }
         public Post Post { get; set; }
+
+        [ForeignKey("AspNetUsers")]
+        public string UserId { get; set; }   // FK to AspNetUsers
+        public ApplicationUser User { get; set; }
     }
 }

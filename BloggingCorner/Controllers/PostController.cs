@@ -1,6 +1,8 @@
 ﻿using BloggingCorner.Data;
 using BloggingCorner.Models;
 using BloggingCorner.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,13 +13,15 @@ namespace BloggingCorner.Controllers
     public class PostController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly string[] allowedExtension = { ".jpg", ".jpeg", ".png", ".gif" };
 
-        public PostController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
+        public PostController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager)
         {
             _db = db;
             _webHostEnvironment = webHostEnvironment;
+            _userManager = userManager;
         }
         private async Task<string> UploadFilet(IFormFile file)
         {
@@ -49,17 +53,32 @@ namespace BloggingCorner.Controllers
         }
         public async Task<IActionResult> Index(int? categoryid)
         {
-            var query = _db.Posts.Include(s => s.Category).AsQueryable();
+            var query = _db.Posts
+                           .Include(s => s.Category)
+                           .Include(s => s.Likes) // <-- Include Likes here
+                           .AsQueryable();
+
             if (categoryid.HasValue && categoryid.Value > 0)
             {
                 query = query.Where(p => p.CategoryId == categoryid);
-
             }
-            var posts = query.ToList();
 
+            var posts = await query.ToListAsync();
             ViewBag.Categories = await _db.Categories.ToListAsync();
+
+            // ✅ If logged in, fetch full name
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    ViewBag.FullName = $"{user.FullName}";
+                }
+            }
+
             return View(posts);
         }
+
 
         [HttpGet]
         public IActionResult Create()
@@ -264,6 +283,64 @@ namespace BloggingCorner.Controllers
             return Json(new { success = false, message = "Failed to add comment.", errors });
         }
 
+        // Anyone can get the current like count
+        [HttpGet]
+        public async Task<IActionResult> GetLikeCount(int postId)
+        {
+            var post = await _db.Posts.Include(p => p.Likes)
+                       .FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post == null)
+                return NotFound();
+
+            return Json(new
+            {
+                likeCount = post.Likes.Count
+            });
+        }
+
+        // Only logged-in Users can like/unlike
+        [HttpPost]
+        [Authorize(Roles = "User , Admin")]
+        public async Task<IActionResult> ToggleLike(int postId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var username = User.Identity.Name ?? "Unknown";
+
+            var post = await _db.Posts.Include(p => p.Likes)
+                       .FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post == null)
+                return NotFound(new { success = false });
+
+            var existingLike = post.Likes.FirstOrDefault(l => l.UserId == userId);
+            bool isNowLiked;
+
+            if (existingLike != null)
+            {
+                _db.Likes.Remove(existingLike);
+                isNowLiked = false;
+            }
+            else
+            {
+                post.Likes.Add(new Like
+                {
+                    UserId = userId,
+                    Username = username,
+                    PostId = post.Id
+                });
+                isNowLiked = true;
+            }
+
+            await _db.SaveChangesAsync();
+
+            return Json(new
+            {
+                success = true,
+                liked = isNowLiked,
+                likeCount = post.Likes.Count
+            });
+        }
 
     }
 }

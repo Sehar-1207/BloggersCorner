@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using BloggingCorner.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -28,15 +32,54 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Auth" asp-action="Index">Login</a>
-                        </li>
+                        </li> *@
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Post" asp-action="Index">Blog Post</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Category" asp-action="Index">Category</a>
                         </li>
+                    </ul>
+
+                    <ul class="navbar-nav m-auto text-white">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            // Fetch the current user synchronously for layout
+                            var currentUser = UserManager.GetUserAsync(User).Result;
+                            @* <li class="nav-item">
+                                <div class="navbar-text text-white d-inline mt-2">
+                                    Hello, @(currentUser?.FullName ?? currentUser?.UserName)!
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link text-light">Logout</button>
+                                </form>
+                            </li>
+                         *@
+                            <li class="nav-item d-flex align-items-center gap-2">
+                                <div class="navbar-text text-white px-3 py-2 rounded-pill text-center">
+                                    Hello, @(currentUser?.FullName ?? currentUser?.UserName)!
+                                </div>
+                                <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
+                                    <button type="submit" class="btn btn-info rounded-pill px-4 py-2">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Auth" asp-action="Index">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-controller="Auth" asp-action="Index" asp-route-panel="register">Register</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -49,9 +92,10 @@
         </main>
     </div>
 
-    <footer class="border-top text-muted text-center m-1 p-1 footer">
+    <footer class="border-top footer text-muted text-center py-1" style="font-size:0.8rem;">
         &copy; 2025 - BloggingCorner - By Sehar Ajmal
     </footer>
+
 
     <!-- JS -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

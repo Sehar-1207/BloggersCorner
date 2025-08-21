@@ -1,33 +1,39 @@
 ﻿@model IEnumerable<BloggingCorner.Models.Category>
 
-<div class="d-flex justify-content-center align-items-center" style="min-height:80vh;">
-    <div class="card shadow p-4" style="width:600px;">
-        <h3 class="text-center mb-3">All Categories</h3>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card shadow-lg border-0 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0 text-center flex-grow-1">All Categories</h3>
+                    <a asp-action="Create" class="btn btn-primary rounded-pill px-3 ms-3">+ Add Category</a>
+                </div>
 
-        <table class="table table-bordered text-center">
-            <thead class="table-warning">
-                <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Total Posts</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var category in Model)
-                {
-                    <tr>
-                        <td>@category.Id</td>
-                        <td>@category.Name</td>
-                        <td>@category.Description</td>
-                        <td>@(category.posts?.Count() ?? 0)</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle text-center mb-0">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Total Posts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in Model)
+                            {
+                                <tr>
+                                    <td>@category.Id</td>
+                                    <td>@category.Name</td>
+                                    <td>@category.Description</td>
+                                    <td>@(category.posts?.Count() ?? 0)</td>
 
-        <div class="text-center mt-3">
-            <a asp-action="Create" class="btn btn-primary">+ Add Category</a>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

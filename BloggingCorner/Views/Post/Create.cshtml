@@ -7,11 +7,11 @@
     <div class="row">
         <div class="col-md-8 offset-md-2">
             <div class="card shadow-lg border-0">
-                <div class=" d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center p-3">
                     <h4 class="mb-0">Create Post</h4>
-                    <a asp-action="Index" class="btn btn-primary rounded-pill btn p-2">Back to List</a>
+                    <a asp-action="Index" class="btn btn-primary rounded-pill px-3">Back to List</a>
                 </div>
-                <hr/>
+                <hr />
                 <div class="card-body">
                     <form asp-action="Create" method="post" asp-controller="Post" enctype="multipart/form-data">
 
@@ -23,7 +23,7 @@
 
                         <div class="mb-3">
                             <label asp-for="post.Title" class="form-label">Title</label>
-                            <input asp-for="post.Title" class="form-control bg-secondary text-black"  />
+                            <input asp-for="post.Title" class="form-control bg-secondary text-black" />
                             <span asp-validation-for="post.Title" class="text-danger"></span>
                         </div>
 
@@ -52,9 +52,9 @@
                             <input asp-for="publishImage" type="file" class="form-control bg-secondary text-black" />
                         </div>
 
-                        <div class="text-center mx-2">
+                        <div class="text-center">
                             <button type="submit" class="btn btn-primary px-4 rounded-pill">Create</button>
-                            <a asp-action="Index" class="btn btn-primary rounded-pill btn px-y">Back to List</a>
+                            <a asp-action="Index" class="btn btn-primary rounded-pill px-4">Back to List</a>
                         </div>
                     </form>
                 </div>
@@ -63,18 +63,29 @@
     </div>
 </div>
 
-@section Scripts{
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="https://cdn.tiny.cloud/1/pzm5ju5i2dg7i74kpc0wq0gnlnwpxsm0mxjs8gftsj0m7gto/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.tiny.cloud/1/pzm5ju5i2dg7i74kpc0wq0gnlnwpxsm0mxjs8gftsj0m7gto/tinymce/8/tinymce.min.js"
+            referrerpolicy="origin" crossorigin="anonymous"></script>
 
     <script>
+        // Initialize TinyMCE only for content field
+        tinymce.init({
+            selector: 'textarea[name="post.Content"]',
+            height: 300,
+            menubar: false,
+            plugins: 'lists link image preview code',
+            toolbar: 'undo redo | formatselect | bold italic underline | bullist numlist | link image | code preview',
+        });
+
+        // Show validation errors dynamically
         document.addEventListener("DOMContentLoaded", function () {
             const errorCard = document.getElementById("errorCard");
 
             const observer = new MutationObserver(() => {
                 if (errorCard.querySelector("ul") && errorCard.querySelector("ul").children.length > 0) {
                     errorCard.classList.remove("d-none");
-
                     setTimeout(() => {
                         errorCard.classList.add("d-none");
                     }, 4000);
@@ -83,11 +94,5 @@
 
             observer.observe(errorCard, { childList: true, subtree: true });
         });
-        // Text editor
-
-         tinymce.init({
-          selector: 'textarea'
-        });
     </script>
-   
 }

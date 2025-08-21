@@ -12,12 +12,12 @@
 
     <h1>@Model.Title</h1>
     <p>
-        <span class="badge bg-info">By :</span> @Model.Author |
-        <span class="badge bg-info">Published At:</span> @Model.PublishedAt.ToString("MMM dd, yyyy")
+        <span class="badge rounded-pill  bg-info">By :</span> @Model.Author |
+        <span class="badge rounded-pill bg-info">Published At:</span> @Model.PublishedAt.ToString("MMM dd, yyyy")
     </p>
     <p>
-        <span class="badge bg-success text-light">Category :</span> @Model.Category?.Name |
-        <span class="badge bg-success text-light">Likes :</span> @Model.Likes?.Count
+        <span class="badge bg-success  rounded-pill text-light">Category :</span> @Model.Category?.Name |
+        <span class="badge bg-success  rounded-pill text-light">Likes :</span> @Model.Likes?.Count
     </p>
 
     <img src="~/@Model.Imagepath" asp-append-version="true" alt="@Model.Title"
@@ -59,7 +59,7 @@
             <label for="commentContent">Comment Content</label>
             <textarea id="commentContent" name="Commentcontent" required class="form-control" rows="3"></textarea>
         </div>
-        <button class="btn btn-primary btn-sm mt-2 p-2 rounded" type="submit">Post Comment</button>
+        <button class="btn btn-primary btn-sm mt-2 p-2 rounded-pill" type="submit">Post Comment</button>
     </form>
 </div>
 

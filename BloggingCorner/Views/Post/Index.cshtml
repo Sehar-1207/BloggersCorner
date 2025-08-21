@@ -1,12 +1,13 @@
-﻿@using BloggingCorner.Helper
-@model IEnumerable<Post>
-
+﻿@model IEnumerable<BloggingCorner.Models.Post>
 @{
     ViewData["Title"] = "Posts";
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 }
 
 <div class="container my-5">
-    <div class="container text-center">
+
+    <!-- Categories -->
+    <div class="container text-center mb-3">
         @if (ViewBag.Categories != null)
         {
             @foreach (var category in ViewBag.Categories)
@@ -14,65 +15,77 @@
                 <a asp-action="Index"
                    asp-route-categoryid="@category.Id"
                    asp-controller="Post"
-                   class="badges ms-2 p-2 bg-danger text-light text-decoration-none">
+                   class="badge rounded-pill ms-1 p-2 bg-danger text-light text-decoration-none">
                     @category.Name
                 </a>
             }
         }
     </div>
 
-    <div class="text-end my-3">
-        <a asp-action="Create"
-           asp-controller="Post"
-           class="btn btn-primary rounded-pill p-2">
-            Create
-        </a>
-    </div>
+    <!-- Create Post Button (Admins only) -->
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="text-end my-3">
+            <a asp-action="Create"
+               asp-controller="Post"
+               class="btn btn-primary rounded-pill px-4 py-2">
+                Create Post
+            </a>
+        </div>
+    }
 
+    <!-- Posts Grid -->
     <div class="row g-4 mt-2">
-        @foreach (var posts in Model)
+        @foreach (var post in Model)
         {
+            var isLiked = post.Likes.Any(l => l.UserId == userId);
             <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-lg rounded-1">
-                    <img src="@posts.Imagepath"
-                         alt="@posts.Title"
-                         class="card-img-top"
-                         style="height:300px; object-fit:cover;" />
+                <div class="card h-100 border-0 shadow-lg rounded-4">
+                    <!-- Post Image -->
+                    <img src="@post.Imagepath" alt="@post.Title" class="card-img-top rounded-top-4" style="height:300px; object-fit:cover;" />
 
                     <div class="card-body">
-                        <h5 class="card-title">@posts.Title</h5>
+                        <h5 class="card-title">@post.Title</h5>
                         <p class="text-muted mb-2">
-                            Published on @posts.PublishedAt.ToString("MMM dd, yyyy")
+                            Published on @post.PublishedAt.ToString("MMM dd, yyyy")
                         </p>
 
-                        @* ✅ Use the improved helper *@
+                        @* Post Content Preview *@
                         @{
-                            var contents = string.IsNullOrWhiteSpace(posts.Content)
+                            var contents = string.IsNullOrWhiteSpace(post.Content)
                             ? "No content available"
-                            : RemoveHtmlHelper.RemoveHelperTag(posts.Content);
+                            : BloggingCorner.Helper.RemoveHtmlHelper.RemoveHelperTag(post.Content);
                         }
-
                         <p class="card-text">
                             @(contents.Length > 100 ? contents.Substring(0, 100) + "..." : contents)
                         </p>
 
-                        <div class="badge bg-success">
-                            <i class="bi bi-hash"></i> @posts.Category?.Name
+                        <!-- Category Badge -->
+                        <div class="badge rounded-pill bg-success mb-2">
+                            <i class="bi bi-hash"></i> @post.Category?.Name
                         </div>
-                        <div class="badge bg-info">
-                            <i class="bi bi-suit-heart"></i> @posts.Likes?.Count
+
+                        <!-- Like Button -->
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-outline-danger btn-sm rounded-pill like-btn px-3"
+                                    data-post-id="@post.Id"
+                                    data-liked="@isLiked">
+                                <i class="bi @(isLiked ? "bi-heart-fill" : "bi-heart")"></i>
+                                <span class="ms-1 like-count">@post.Likes?.Count</span>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        <a class="btn btn-primary btn-sm"
+                    <!-- Footer -->
+                    <div class="card-footer d-flex justify-content-between align-items-center rounded-bottom-4">
+                        <a class="btn btn-primary btn-sm rounded-pill px-3"
                            asp-action="Details"
                            asp-controller="Post"
-                           asp-route-id="@posts.Id">
+                           asp-route-id="@post.Id">
                             Read More
                         </a>
                         <div class="text-end">
-                            <span class="text-muted">@posts.Author</span>
+                            <span class="text-muted">@post.Author</span>
                         </div>
                     </div>
                 </div>
@@ -80,3 +93,73 @@
         }
     </div>
 </div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title">Login Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>You need to login to like posts.</p>
+                <a asp-action="Index" asp-controller="Auth" asp-route-panel="login" class="btn btn-primary rounded-pill px-4">Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+
+            $('.container').on("click", ".like-btn", function (e) {
+                e.preventDefault();
+
+                var btn = $(this);
+                var postId = btn.data("post-id");
+                var icon = btn.find("i");
+                var countSpan = btn.find(".like-count");
+
+                // If user is not logged in, show login modal and fetch latest count
+                var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase() === 'true';
+                if (!isLoggedIn) {
+                    $('#loginModal').modal('show');
+                    $.get('/Post/GetLikeCount', { postId: postId }, function(res) {
+                        countSpan.text(res.likeCount);
+                    });
+                    return;
+                }
+
+                btn.prop("disabled", true);
+
+                $.ajax({
+                    url: '/Post/ToggleLike',
+                    type: 'POST',
+                    data: { postId: postId },
+                    success: function (res) {
+                        if (res.liked) {
+                            icon.removeClass("bi-heart").addClass("bi-heart-fill");
+                        } else {
+                            icon.removeClass("bi-heart-fill").addClass("bi-heart");
+                        }
+                        countSpan.text(res.likeCount);
+                    },
+                    error: function (xhr) {
+                        alert("An error occurred. Please try again.");
+                        console.error("AJAX Error:", xhr.responseText);
+
+                        $.get('/Post/GetLikeCount', { postId: postId }, function(res) {
+                            countSpan.text(res.likeCount);
+                        });
+                    },
+                    complete: function () {
+                        btn.prop("disabled", false);
+                    }
+                });
+            });
+
+        });
+    </script>
+}
