@@ -81,6 +81,8 @@ namespace BloggingCorner.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
+
         public IActionResult Create()
         {
             var postmodel = new PostViewModel();
@@ -153,6 +155,8 @@ namespace BloggingCorner.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
+
         public async Task<IActionResult> Edit(int id)
         {
             if (id == null)
@@ -226,6 +230,7 @@ namespace BloggingCorner.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Delete(int id)
         {
