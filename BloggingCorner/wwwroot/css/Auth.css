@@ -260,3 +260,65 @@ body {
 .auth-container.right-panel-active .overlay-right {
     transform: translateX(20%);
 }
+
+/* Add this to your existing wwwroot/css/Auth.css file */
+
+/* Styles for the Toast Container */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1060; /* Ensure it's above other content */
+    pointer-events: none; /* Allows clicks through to elements below */
+    display: flex; /* For stacking multiple toasts */
+    flex-direction: column; /* Stack vertically */
+    align-items: flex-end; /* Align to the right */
+}
+
+/* Styles for individual Toast messages (custom design) */
+.custom-toast {
+    /* Use a class like .custom-toast instead of .toast to avoid Bootstrap conflicts */
+    background-color: #333; /* Default background, will be overridden by type */
+    color: white; /* Default text color */
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: none; /* Hidden by default, JS will show it */
+    min-width: 280px;
+    max-width: 350px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+    pointer-events: auto; /* Re-enable pointer events for the toast itself */
+    opacity: 0; /* Start hidden for fade-in effect */
+    transition: opacity 0.3s ease-in-out; /* Smooth fade in/out */
+}
+
+    /* Specific custom-toast colors based on type */
+    .custom-toast.toast-success {
+        /* Use your requested success color or a standard green */
+        background: linear-gradient(to right, #28a745, #218838); /* Green gradient */
+        color: white;
+    }
+
+    .custom-toast.toast-error {
+        /* Use your requested error color */
+        background: linear-gradient(to right, #dc3545, #c82333); /* Red gradient */
+        color: white; /* White text on red for good contrast */
+    }
+
+    .custom-toast.toast-info {
+        background: linear-gradient(to right, #17a2b8, #138496); /* Blue gradient */
+        color: white;
+    }
+
+    .custom-toast.toast-warning {
+        background: linear-gradient(to right, #ffc107, #e0a800); /* Yellow gradient */
+        color: #333; /* Dark text for warning */
+    }
+
+    /* Icon styling */
+    .custom-toast i {
+        margin-right: 8px;
+    }

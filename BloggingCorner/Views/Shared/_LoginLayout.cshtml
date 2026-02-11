@@ -1,4 +1,4 @@
-﻿<style>
+﻿@* <style>
     body {
         margin: 0;
         padding: 0;
@@ -32,6 +32,81 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/Auth.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html> *@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BloggingCorner</title>
+
+    <!-- Base CSS (body background) -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            /* Gradient background */
+            background: linear-gradient(to right, #FFD6E7, #D6E5FF, #D6FFFC);
+        }
+    </style>
+
+    <!-- Auth CSS (includes custom toast styles now) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.2.3/dist/yeti/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/Auth.css" asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <!-- Toast Container - Added Here -->
+    <div id="toast-container"></div>
+
+    <div class="auth-container">
+        @RenderBody()
+    </div>
+
+    <!-- JS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/Auth.js" asp-append-version="true"></script>
+
+    <!-- Custom Toast JS -->
+    <script src="~/js/showToast.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Check for TempData messages on page load
+            const toastMessage = '@TempData["ToastMessage"]';
+            const toastType = '@TempData["ToastType"]'; // 'success', 'error', 'info', 'warning'
+
+            if (toastMessage && toastMessage.trim() !== '') {
+                // Call the showToast function defined in showToast.js
+                showToast(toastMessage, toastType);
+            }
+
+            // --- Existing JS for panel switching ---
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+            const authContainer = document.getElementById('auth-container');
+
+            if (signUpButton && signInButton && authContainer) {
+                signUpButton.addEventListener('click', () => {
+                    authContainer.classList.add("right-panel-active");
+                });
+
+                signInButton.addEventListener('click', () => {
+                    authContainer.classList.remove("right-panel-active");
+                });
+            }
+            // --- End existing JS ---
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

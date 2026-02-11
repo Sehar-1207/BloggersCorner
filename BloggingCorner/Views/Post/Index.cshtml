@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BloggingCorner.Models.Post>
+﻿@* @model IEnumerable<BloggingCorner.Models.Post>
 @{
     ViewData["Title"] = "Posts";
     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -51,7 +51,6 @@
                             Published on @post.PublishedAt.ToString("MMM dd, yyyy")
                         </p>
 
-                        @* Post Content Preview *@
                         @{
                             var contents = string.IsNullOrWhiteSpace(post.Content)
                             ? "No content available"
@@ -174,6 +173,222 @@
                 window.location.href = url;
             });
 
+        });
+    </script>
+} *@
+
+@model IEnumerable<BloggingCorner.Models.Post>
+@{
+    ViewData["Title"] = "Posts";
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<style>
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    #categoryScroll::-webkit-scrollbar {
+        display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    #categoryScroll {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .category-slider-container .btn-scroll {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+</style>
+
+<div class="container my-5">
+
+    <div class="category-slider-container position-relative mb-3">
+        <button class="btn btn-light border shadow-sm position-absolute start-0 top-50 translate-middle-y z-3 rounded-circle btn-scroll"
+                id="scrollLeft" style="display: none;">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+
+        <div id="categoryScroll" class="d-flex overflow-hidden px-5 py-2 gap-2" style="scroll-behavior: smooth; white-space: nowrap;">
+            @if (ViewBag.Categories != null)
+            {
+                <a asp-action="Index" asp-controller="Post"
+                   class="badge rounded-pill p-2 px-3 bg-danger text-light text-decoration-none flex-shrink-0">
+                    All Categories
+                </a>
+
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <a asp-action="Index"
+                       asp-route-categoryid="@category.Id"
+                       asp-controller="Post"
+                       class="badge rounded-pill p-2 px-3 bg-danger text-light text-decoration-none flex-shrink-0">
+                        @category.Name
+                    </a>
+                }
+            }
+        </div>
+
+        <button class="btn btn-light border shadow-sm position-absolute end-0 top-50 translate-middle-y z-3 rounded-circle btn-scroll"
+                id="scrollRight">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
+
+    <hr />
+
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="text-end my-3">
+            <a asp-action="Create" asp-controller="Post" class="btn btn-primary rounded-pill px-3 py-2">
+                <i class="bi bi-plus-lg"></i> Create Post
+            </a>
+        </div>
+    }
+
+    <div class="row g-4 mt-2">
+        @foreach (var post in Model)
+        {
+            var isLiked = post.Likes?.Any(l => l.UserId == userId) ?? false;
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden">
+                    <img src="@post.Imagepath" alt="@post.Title" class="card-img-top" style="height:250px; object-fit:cover;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">@post.Title</h5>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-calendar-event"></i> @post.PublishedAt.ToString("MMM dd, yyyy")
+                        </p>
+
+                        @{
+                            var contents = string.IsNullOrWhiteSpace(post.Content)
+                            ? "No content available"
+                            : BloggingCorner.Helper.RemoveHtmlHelper.RemoveHelperTag(post.Content);
+                        }
+                        <p class="card-text text-secondary">
+                            @(contents.Length > 100 ? contents.Substring(0, 100) + "..." : contents)
+                        </p>
+
+                        <div class="badge rounded-pill bg-success mb-3">
+                            <i class="bi bi-tag"></i> @post.Category?.Name
+                        </div>
+
+                        <div class="d-flex align-items-center mb-2">
+                            <button class="btn btn-outline-danger btn-sm rounded-pill like-btn px-3"
+                                    data-post-id="@post.Id"
+                                    data-liked="@isLiked">
+                                <i class="bi @(isLiked ? "bi-heart-fill" : "bi-heart")"></i>
+                                <span class="ms-1 like-count">@post.Likes?.Count</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center pb-3">
+                        <button class="btn btn-primary btn-sm rounded-pill px-4 read-more-btn"
+                                data-post-id="@post.Id"
+                                data-details-url="@Url.Action("Details", "Post", new { id = post.Id })">
+                            Read More
+                        </button>
+                        <span class="text-muted small">By @post.Author</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Login Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center pb-4">
+                <p class="text-muted">You need to login to interact with posts or view full details.</p>
+                <a asp-action="Index" asp-controller="Auth" asp-route-panel="login" class="btn btn-primary rounded-pill px-5">Go to Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            var isLoggedIn = '@User.Identity.IsAuthenticated'.toLowerCase() === 'true';
+
+            // --- Category Slider Logic ---
+            const scrollContainer = document.getElementById('categoryScroll');
+            const btnLeft = document.getElementById('scrollLeft');
+            const btnRight = document.getElementById('scrollRight');
+
+            const updateButtonVisibility = () => {
+                if (!scrollContainer) return;
+                btnLeft.style.display = scrollContainer.scrollLeft > 5 ? 'block' : 'none';
+                const canScrollRight = scrollContainer.scrollWidth > (scrollContainer.scrollLeft + scrollContainer.clientWidth + 5);
+                btnRight.style.display = canScrollRight ? 'block' : 'none';
+            };
+
+            $('#scrollRight').on('click', function() {
+                scrollContainer.scrollBy({ left: 250, behavior: 'smooth' });
+            });
+
+            $('#scrollLeft').on('click', function() {
+                scrollContainer.scrollBy({ left: -250, behavior: 'smooth' });
+            });
+
+            scrollContainer.addEventListener('scroll', updateButtonVisibility);
+            window.addEventListener('resize', updateButtonVisibility);
+            updateButtonVisibility();
+
+            // --- Like Button Logic ---
+            $('.container').on("click", ".like-btn", function (e) {
+                e.preventDefault();
+                var btn = $(this);
+                var postId = btn.data("post-id");
+                var icon = btn.find("i");
+                var countSpan = btn.find(".like-count");
+
+                if (!isLoggedIn) {
+                    $('#loginModal').modal('show');
+                    return;
+                }
+
+                btn.prop("disabled", true);
+
+                $.ajax({
+                    url: '/Post/ToggleLike',
+                    type: 'POST',
+                    data: { postId: postId },
+                    success: function (res) {
+                        if (res.liked) {
+                            icon.removeClass("bi-heart").addClass("bi-heart-fill");
+                        } else {
+                            icon.removeClass("bi-heart-fill").addClass("bi-heart");
+                        }
+                        countSpan.text(res.likeCount);
+                    },
+                    error: function (xhr) {
+                        alert("An error occurred. Please try again.");
+                    },
+                    complete: function () {
+                        btn.prop("disabled", false);
+                    }
+                });
+            });
+
+            // --- Read More Logic ---
+            $('.container').on("click", ".read-more-btn", function(e){
+                e.preventDefault();
+                if(!isLoggedIn){
+                    $('#loginModal').modal('show');
+                    return;
+                }
+                window.location.href = $(this).data("details-url");
+            });
         });
     </script>
 }

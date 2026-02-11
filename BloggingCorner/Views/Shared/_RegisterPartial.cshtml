@@ -2,6 +2,11 @@
 
 <div class="form-container sign-up-container">
     <form asp-controller="Auth" asp-action="Register" method="post" class="auth-form">
+
+        @Html.AntiForgeryToken()
+
+        @* <div asp-validation-summary="All" class="text-danger"></div> *@
+
         <h1>Create Account</h1>
 
         <input asp-for="UserName" placeholder="Username" />
@@ -13,15 +18,14 @@
         <input asp-for="Email" placeholder="Email" />
         <span asp-validation-for="Email" class="text-danger"></span>
 
-        <input asp-for="Password" placeholder="Password" />
+        <input asp-for="Password" placeholder="Password" type="password" />
         <span asp-validation-for="Password" class="text-danger"></span>
 
-        <input asp-for="ConfirmPassword" placeholder="Confirm Password" />
+        <input asp-for="ConfirmPassword" placeholder="Confirm Password" type="password" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
 
         <input asp-for="AdminCode" placeholder="Admin Code (Optional)" type="password" />
         <span asp-validation-for="AdminCode" class="text-danger"></span>
-
 
         <button type="submit" class="auth-button">Sign Up</button>
     </form>
